@@ -6,6 +6,7 @@ import javafx.event.EventHandler;
 import javafx.scene.input.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
+import javafx.scene.shape.*;
 import javafx.scene.image.*;
 import javafx.geometry.*;
 import javafx.scene.layout.*;
@@ -19,14 +20,15 @@ import javafx.embed.swing.SwingFXUtils;
 import javax.imageio.ImageIO;
 
 public class Colour_pick extends Application {
+	public static final Color pixel = new Color(1.0,1.0,1.0,1.0);
     ImageView myImageView;
+    Image image = new Image("arc_reactor.jpeg");
+    PixelReader pixelReader = image.getPixelReader();
+    final Circle reporter = new Circle(50,300,50);
     @Override
     public void start(Stage stage) throws FileNotFoundException{
         stage.setTitle("ColorPicker");
         stage.setMaximized(true);
-
-	 //    BorderPane border = new BorderPane();
-		// border.setPadding(new Insets(20, 0, 20, 20));
 
 		Button gallery = new Button("Gallery");
 		Button camera = new Button("Camera");
@@ -37,11 +39,14 @@ public class Colour_pick extends Application {
 
 		gallery.setOnAction(btnLoadEventListener);
 		myImageView = new ImageView();
+		//myImageView.setOnAction(imgLoadEventListener);
+		createMonitoredLabel(reporter);
+		//myImageView = createMonitoredLabel(reporter);
 
 		VBox buttons = new VBox();
 		buttons.setSpacing(10);
 		buttons.setPadding(new Insets(10, 20, 10, 20)); 
-		buttons.getChildren().addAll(gallery,camera);
+		buttons.getChildren().addAll(gallery,camera,reporter);
 
 		HBox photo = new HBox();
 		photo.getChildren().addAll(buttons,myImageView);
@@ -52,6 +57,15 @@ public class Colour_pick extends Application {
     }
     public static void main(String args[]){ 
       launch(args); 
+   }
+
+   void createMonitoredLabel(final Circle reporter) {
+   		myImageView.setOnMouseMoved(new EventHandler<MouseEvent>() {
+      @Override public void handle(MouseEvent event) {
+      	Color pixel = pixelReader.getColor((int)event.getX(),(int)event.getY());
+        reporter.setFill(pixel);
+      }
+    });
    }
 
        EventHandler<ActionEvent> btnLoadEventListener
@@ -85,4 +99,5 @@ public class Colour_pick extends Application {
             }
         }
     };
+
 }
