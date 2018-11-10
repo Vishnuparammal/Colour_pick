@@ -25,7 +25,6 @@ public class Colour_pick extends Application {
 
 		Button gallery = new Button("Gallery");
 		Button camera = new Button("Camera");
-		// Button colour = new Button("Colour_pick");
 
 		HBox button = new HBox(5);
 		button.setPadding(new Insets(10, 10, 10, 10));
@@ -103,9 +102,6 @@ public class Colour_pick extends Application {
 				hex.setText("hex :\t\t\t"+string);
 			}
 		}));
-
-		
-		// Group root  = new Group(right);
 
 		Scene scene = new Scene(finalScreen,1000,1000);
 		stage.setScene(scene);
