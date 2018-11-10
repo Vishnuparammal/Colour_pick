@@ -1,103 +1,118 @@
-import java.io.*;
+import java.util.*;
+import java.io.File;
 import javafx.application.Application;
-import javafx.event.*;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.input.*;
+import javafx.stage.*;
 import javafx.scene.*;
-import javafx.scene.control.*;
-import javafx.scene.shape.*;
-import javafx.scene.image.*;
-import javafx.geometry.*;
-import javafx.scene.layout.*;
+import javafx.scene.input.*;
 import javafx.scene.paint.*;
 import javafx.scene.text.*;
-import javafx.stage.Stage;
-import javafx.stage.*;
-import java.awt.image.BufferedImage;
-import java.util.logging.*;
-import javafx.embed.swing.SwingFXUtils;
-import javax.imageio.ImageIO;
+import javafx.scene.layout.*;
+import javafx.scene.input.*;
+import javafx.scene.control.*;
+import javafx.scene.image.*;
+import javafx.scene.shape.*;
+import javafx.geometry.*;
+import javafx.event.*;
 
 public class Colour_pick extends Application {
-	public static final Color pixel = new Color(1.0,1.0,1.0,1.0);
-    ImageView myImageView;
-    Image image = new Image("arc_reactor.jpeg");
-    PixelReader pixelReader = image.getPixelReader();
-    final Circle reporter = new Circle(50,300,50);
-    @Override
-    public void start(Stage stage) throws FileNotFoundException{
-        stage.setTitle("ColorPicker");
-        stage.setMaximized(true);
+		String string = new String("");
+	@Override
+	public void start(Stage stage){
+		List<List<Color>> listOfLists = new ArrayList<List<Color>>(); 
+		ImageView myImageView = new ImageView();
+
+		Circle reporter = new Circle(50);
 
 		Button gallery = new Button("Gallery");
 		Button camera = new Button("Camera");
+		// Button colour = new Button("Colour_pick");
 
+		HBox button = new HBox(5);
+		button.setPadding(new Insets(10, 10, 10, 10));
+		button.getChildren().addAll(gallery,camera);
 
-		gallery.setMaxWidth(Double.MAX_VALUE);
-		camera.setMaxWidth(Double.MAX_VALUE);
+		VBox left = new VBox(5);
+		left.setPadding(new Insets(10, 10, 10, 10));
+		left.getChildren().addAll(button,myImageView);
 
-		gallery.setOnAction(btnLoadEventListener);
-		myImageView = new ImageView();
-		//myImageView.setOnAction(imgLoadEventListener);
-		createMonitoredLabel(reporter);
-		//myImageView = createMonitoredLabel(reporter);
+		Text hex = new Text("hex :\t"+string);
 
-		VBox buttons = new VBox();
-		buttons.setSpacing(10);
-		buttons.setPadding(new Insets(10, 20, 10, 20)); 
-		buttons.getChildren().addAll(gallery,camera,reporter);
+		Text red = new Text("red :\t"+string);
+		Text green = new Text("green :\t"+string);
+		Text blue = new Text("blue :\t"+string);
+		
+		Text hue = new Text("hue :\t"+string);
+		Text saturation = new Text("saturation :\t"+string);
+		Text brightness = new Text("brightness :\t"+string);
 
-		HBox photo = new HBox();
-		photo.getChildren().addAll(buttons,myImageView);
-        Group root = new Group(photo);
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.show();
-    }
-    public static void main(String args[]){ 
-      launch(args); 
-   }
+		Text opacity = new Text("opacity :\t"+string);
 
-   void createMonitoredLabel(final Circle reporter) {
-   		myImageView.setOnMouseMoved(new EventHandler<MouseEvent>() {
-      @Override public void handle(MouseEvent event) {
-      	Color pixel = pixelReader.getColor((int)event.getX(),(int)event.getY());
-        reporter.setFill(pixel);
-      }
-    });
-   }
+		VBox right = new VBox(5);
+		right.setPadding(new Insets(10, 10, 10, 10));
+		right.getChildren().addAll(reporter,opacity,red,green,blue,hue,saturation,brightness,hex);
 
-       EventHandler<ActionEvent> btnLoadEventListener
-    = new EventHandler<ActionEvent>(){
-  
-        @Override
-        public void handle(ActionEvent t) {
-            FileChooser fileChooser = new FileChooser();
-              
-            //Set extension filter
-            FileChooser.ExtensionFilter extFilterJPG = 
-                    new FileChooser.ExtensionFilter("JPG files (*.JPG)", "*.JPG");
-            FileChooser.ExtensionFilter extFilterjpg = 
-                    new FileChooser.ExtensionFilter("jpg files (*.jpg)", "*.jpg");
-            FileChooser.ExtensionFilter extFilterPNG = 
-                    new FileChooser.ExtensionFilter("PNG files (*.PNG)", "*.PNG");
-            FileChooser.ExtensionFilter extFilterpng = 
-                    new FileChooser.ExtensionFilter("png files (*.png)", "*.png");
-            fileChooser.getExtensionFilters()
-                    .addAll(extFilterJPG, extFilterjpg, extFilterPNG, extFilterpng);
- 
-            //Show open file dialog
-            File file = fileChooser.showOpenDialog(null);
-             
-            try {
-                BufferedImage bufferedImage = ImageIO.read(file);
-                Image image = SwingFXUtils.toFXImage(bufferedImage, null);
-                myImageView.setImage(image);
-            } catch (IOException ex) {
-                Logger.getLogger(Colour_pick.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-    };
+		HBox finalScreen = new HBox(5);
+		finalScreen.setPadding(new Insets(10, 10, 10, 10));
+		finalScreen.getChildren().addAll(left,right);
 
+		gallery.setOnMouseClicked((new EventHandler<MouseEvent>() { 
+			public void handle(MouseEvent event) {
+				FileChooser fileChooser = new FileChooser();
+				File file = fileChooser.showOpenDialog(null);
+
+				if(file!=null)
+				{
+					Image image = new Image(file.toURI().toString());
+					myImageView.setImage(image);
+					listOfLists.clear();
+					PixelReader pixelReader = image.getPixelReader();
+					for(int pixelX = 0; pixelX < image.getWidth(); pixelX++)
+					{
+						listOfLists.add(new ArrayList<Color>());
+						for(int pixelY = 0; pixelY <image.getHeight(); pixelY++)
+							listOfLists.get(pixelX).add(pixelReader.getColor(pixelX,pixelY));
+					}
+				}
+			}
+		}));		
+
+		myImageView.setOnMouseMoved((new EventHandler<MouseEvent>() { 
+			public void handle(MouseEvent event) {
+				
+				reporter.setFill(listOfLists.get((int)event.getX()).get((int)event.getY()));
+				
+				string = (int)(((Color)reporter.getFill()).getOpacity())+"";
+				opacity.setText("opacity :\t\t"+string);
+
+				string = (int)(((Color)reporter.getFill()).getRed()*255)+"";
+				red.setText("red :\t\t\t"+string);
+				string = (int)(((Color)reporter.getFill()).getGreen()*255)+"";
+				green.setText("green :\t\t"+string);
+				string = (int)(((Color)reporter.getFill()).getBlue()*255)+"";
+				blue.setText("blue :\t\t"+string);
+
+				string = (int)((Color)reporter.getFill()).getHue()+"";
+				hue.setText("hue :\t\t\t"+string);
+				string = (int)(((Color)reporter.getFill()).getSaturation()*100)+"";
+				saturation.setText("saturation :\t"+string);
+				string = (int)(((Color)reporter.getFill()).getBrightness()*100)+"";
+				brightness.setText("brightness :\t"+string);
+
+				string = String.format("#%02x%02x%02x", (int)(((Color)reporter.getFill()).getRed()*255) , (int)(((Color)reporter.getFill()).getGreen()*255),
+										(int)(((Color)reporter.getFill()).getBlue()*255));
+				hex.setText("hex :\t\t\t"+string);
+			}
+		}));
+
+		
+		// Group root  = new Group(right);
+
+		Scene scene = new Scene(finalScreen,1000,1000);
+		stage.setScene(scene);
+		stage.setTitle("ColorPicker");
+		stage.show();
+	}
+	public static void main(String args[]){ 
+		launch(args); 
+	}
 }
